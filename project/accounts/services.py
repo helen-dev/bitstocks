@@ -1,3 +1,5 @@
+from django.db import IntegrityError, transaction as tr
+
 from .models import Account, Transaction
 
 
@@ -15,15 +17,20 @@ def perform_deposit(user, amount):
     amount = convert_to_satoshi(amount)
     account = Account.objects.get(user=user)
     account.balance += amount
-    account.save()
 
-    transaction = Transaction.objects.create(
-        account=account,
-        transaction_type=Transaction.TRANSACTION_TYPE_DEPOSIT,
-        amount=amount
-    )
+    try:
+        with tr.atomic():
+            account.save()
 
-    return transaction
+            transaction = Transaction.objects.create(
+                account=account,
+                transaction_type=Transaction.TRANSACTION_TYPE_DEPOSIT,
+                amount=amount
+            )
+
+        return transaction
+    except IntegrityError:
+        pass
 
 
 def perform_withdrawal(user, amount):
