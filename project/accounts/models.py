@@ -8,7 +8,7 @@ class Account(models.Model):
     """
 
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='accounts')
-    balance = models.FloatField('balance', default=0)
+    balance = models.PositiveBigIntegerField('balance', default=0)
 
 
 class Transaction(models.Model):
