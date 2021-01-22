@@ -34,4 +34,21 @@ def perform_deposit(user, amount):
 
 
 def perform_withdrawal(user, amount):
-    pass
+    amount = convert_to_satoshi(amount)
+    account = Account.objects.get(user=user)
+    if account.balance < amount:
+        return
+    account.balance -= amount
+
+    try:
+        with tr.atomic():
+            account.save()
+            transaction = Transaction.objects.create(
+                account=account,
+                transaction_type=Transaction.TRANSACTION_TYPE_WITHDRAWAL,
+                amount=amount
+            )
+
+        return transaction
+    except IntegrityError:
+        pass
