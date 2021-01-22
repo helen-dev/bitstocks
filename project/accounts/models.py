@@ -27,3 +27,5 @@ class Transaction(models.Model):
     )
 
     account = models.ForeignKey(Account, on_delete=models.CASCADE, related_name='transactions')
+    created_date = models.DateTimeField(auto_now_add=True)
+    amount = models.PositiveBigIntegerField()

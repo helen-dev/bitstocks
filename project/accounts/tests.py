@@ -2,7 +2,7 @@ from django.test import TestCase
 from django.contrib.auth.models import User
 
 from .models import Account, Transaction
-from .services import perform_deposit
+from .services import perform_deposit, convert_to_bitcoin
 
 
 class DepositTestCase(TestCase):
@@ -24,7 +24,7 @@ class DepositTestCase(TestCase):
         self.assertEquals(Transaction.objects.count(), 1)
         # Check balance is now 0.1
         account = Account.objects.get(user=self.user)
-        self.assertEquals(account.balance, 0.1)
+        self.assertEquals(convert_to_bitcoin(account.balance), 0.1)
 
     def test_multiple_deposit(self):
         # Get the account and check 0 balance
@@ -42,4 +42,4 @@ class DepositTestCase(TestCase):
         self.assertEquals(Transaction.objects.count(), 3)
         # Check balance is now 0.1
         account = Account.objects.get(user=self.user)
-        self.assertEquals(account.balance, 0.3)
+        self.assertEquals(convert_to_bitcoin(account.balance), 0.3)
